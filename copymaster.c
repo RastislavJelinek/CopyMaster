@@ -54,13 +54,13 @@ printf("toto %d\n",argc);
 
         if(cpm_options.fast){
             char ch;
-            while(fread(&ch, 1, 1, file_in) > 0){
-                fwrite(&ch , 1 , 1 , file_out );
+            while(read(0, &ch, 1) > 0){
+                write(1, &ch, 1);
             }
         }else{
             char ch;
-            while(fread(&ch, 1, 1, file_in) > 0){
-                fwrite(&ch , 1 , 1 , file_out );
+            while(read(0, &ch, 1) > 0){
+                write(1, &ch, 1);
             }
         }
 
