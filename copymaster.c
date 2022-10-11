@@ -57,29 +57,28 @@ int main(int argc, char* argv[])
     int size = s.st_size; 
     mode_t input_mode = s.st_mode;
 
+    if(!S_ISREG(s.st_mode)){
+        FatalError('i',"ZLY TYP VSTUPNEHO SUBORU",34);
+    }
+    if(cpm_options.inode && s.st_ino != cpm_options.inode_number){
+        FatalError('i',"ZLY INODE",34);
+    }
 
 
 
     // no arg or -s --slow
     if(argc == 3 || cpm_options.slow){
-        file_out = open(cpm_options.outfile, O_TRUNC | O_CREAT | O_WRONLY , input_mode);
+        file_out = open(cpm_options.outfile, O_CREAT | O_WRONLY , input_mode);
         fstat(file_out,&s);
         mode_t input_mode = s.st_mode;
-        
-        /*if( S_ISREG(input_mode) )
-            printf("regular\n");
-        else
-           printf("nonregular\n");
-*/
-        if(S_IWUSR == input_mode){
-            char ch;
-            while(read(file_in, &ch, 1) > 0){
-                write(file_out, &ch, 1);
-            }
+        if(S_IWUSR != input_mode){
+            FatalError('B',"INA CHYBA",21);
         }
 
-
-        
+        char ch;
+        while(read(file_in, &ch, 1) > 0){
+            write(file_out, &ch, 1);
+        }
     }
 
     // -f --fast
@@ -94,7 +93,7 @@ int main(int argc, char* argv[])
     if(cpm_options.create){
         file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, cpm_options.create_mode);
         if (file_out < 0) {
-            FatalError('B',"SUBOR EXISTUJE",23);
+            FatalError('c',"SUBOR EXISTUJE",23);
         }
         char ch[size];
         read(file_in, &ch, size);
@@ -105,7 +104,7 @@ int main(int argc, char* argv[])
     if(cpm_options.overwrite){
         file_out = open(cpm_options.outfile, O_TRUNC | O_WRONLY);
         if (file_out < 0) {
-            FatalError('B',"SUBOR NEEXISTUJE",24);
+            FatalError('o',"SUBOR NEEXISTUJE",24);
         }
         char ch[size];
         read(file_in, &ch, size);
@@ -116,7 +115,7 @@ int main(int argc, char* argv[])
     if(cpm_options.append){
         int file_out = open(cpm_options.outfile, O_WRONLY | O_APPEND);
         if (file_out < 0) {
-            FatalError('B',"SUBOR NEEXISTUJE",22);
+            FatalError('a',"SUBOR NEEXISTUJE",22);
         }
         char ch[size];
         read(file_in, &ch, size);
@@ -127,7 +126,7 @@ int main(int argc, char* argv[])
     if(cpm_options.lseek){
         int file_out = open(cpm_options.outfile, O_WRONLY);
         if (file_out < 0) {
-            FatalError('B',"SUBOR NEEXISTUJE",33);
+            FatalError('l',"SUBOR NEEXISTUJE",33);
         }
         int a = lseek(file_in, cpm_options.lseek_options.pos1, SEEK_CUR);
         printf("%d",a);
@@ -137,7 +136,7 @@ int main(int argc, char* argv[])
         }*/
 
         if(lseek(file_out, cpm_options.lseek_options.pos2, cpm_options.lseek_options.x) < 0){
-            FatalError('B',"CHYBA POZICIE outfile",33);
+            FatalError('l',"CHYBA POZICIE outfile",33);
         }
 
 
