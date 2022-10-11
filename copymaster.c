@@ -63,10 +63,23 @@ int main(int argc, char* argv[])
     // no arg or -s --slow
     if(argc == 3 || cpm_options.slow){
         file_out = open(cpm_options.outfile, O_TRUNC | O_CREAT | O_WRONLY , input_mode);
-        char ch;
-        while(read(file_in, &ch, 1) > 0){
-            write(file_out, &ch, 1);
+        fstat(file_out,&s);
+        mode_t input_mode = s.st_mode;
+        
+        /*if( S_ISREG(input_mode) )
+            printf("regular\n");
+        else
+           printf("nonregular\n");
+*/
+        if(S_IWUSR == input_mode){
+            char ch;
+            while(read(file_in, &ch, 1) > 0){
+                write(file_out, &ch, 1);
+            }
         }
+
+
+        
     }
 
     // -f --fast
