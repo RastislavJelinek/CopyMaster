@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "options.h"
-
 
 void FatalError(char c, const char* msg, int exit_status);
 void PrintCopymasterOptions(struct CopymasterOptions* cpm_options);
@@ -12,12 +12,13 @@ void PrintCopymasterOptions(struct CopymasterOptions* cpm_options);
 
 int main(int argc, char* argv[])
 {
-    struct CopymasterOptions cpm_options = ParseCopymasterOptions(argc, argv);
+printf("toto %d\n",argc);
 
+    struct CopymasterOptions cpm_options = ParseCopymasterOptions(argc, argv);
     //-------------------------------------------------------------------
     // Kontrola hodnot prepinacov
     //-------------------------------------------------------------------
-
+    
     // Vypis hodnot prepinacov odstrante z finalnej verzie
     
     PrintCopymasterOptions(&cpm_options);
@@ -38,6 +39,35 @@ int main(int argc, char* argv[])
     //-------------------------------------------------------------------
     
     // TODO Implementovat kopirovanie suborov
+
+
+    if(argc == 3){
+        FILE *file_in;
+        file_in = fopen(cpm_options.infile, "r");
+        if (file_in == NULL) {
+            FatalError('B',"SUBOR NEEXISTUJE",21);
+        }
+        FILE *file_out;
+        file_out = fopen(cpm_options.outfile, "w");
+
+        
+
+        if(cpm_options.fast){
+            char ch;
+            while(fread(&ch, 1, 1, file_in) > 0){
+                fwrite(&ch , 1 , 1 , file_out );
+            }
+        }else{
+            char ch;
+            while(fread(&ch, 1, 1, file_in) > 0){
+                fwrite(&ch , 1 , 1 , file_out );
+            }
+        }
+
+
+
+    }
+
     
     // cpm_options.infile
     // cpm_options.outfile
@@ -47,13 +77,15 @@ int main(int argc, char* argv[])
     //-------------------------------------------------------------------
     
     if (cpm_options.directory) {
+        fprintf(stdout, "kooook\n");
+        FatalError(cpm_options.directory,"INA CHYBA",23);
         // TODO Implementovat vypis adresara
     }
         
     //-------------------------------------------------------------------
     // Osetrenie prepinacov po kopirovani
     //-------------------------------------------------------------------
-    
+   
     // TODO Implementovat osetrenie prepinacov po kopirovani
     
     return 0;
