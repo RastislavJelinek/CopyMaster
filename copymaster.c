@@ -3,6 +3,8 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 #include "options.h"
 
@@ -12,8 +14,6 @@ void PrintCopymasterOptions(struct CopymasterOptions* cpm_options);
 
 int main(int argc, char* argv[])
 {
-printf("toto %d\n",argc);
-
     struct CopymasterOptions cpm_options = ParseCopymasterOptions(argc, argv);
     //-------------------------------------------------------------------
     // Kontrola hodnot prepinacov
@@ -41,37 +41,36 @@ printf("toto %d\n",argc);
     // TODO Implementovat kopirovanie suborov
 
 
-    if(argc == 3){
-        FILE *file_in;
-        file_in = fopen(cpm_options.infile, "r");
-        if (file_in == NULL) {
+    if(argc == 3 || cpm_options.slow){
+        int file_in = open(cpm_options.infile, O_RDONLY);
+        if (file_in < 0) {
             FatalError('B',"SUBOR NEEXISTUJE",21);
         }
-        FILE *file_out;
-        file_out = fopen(cpm_options.outfile, "w");
+        int file_out = open(cpm_options.outfile, O_CREAT | O_WRONLY);
 
-        
-
-        if(cpm_options.fast){
-            char ch;
-            while(read(0, &ch, 1) > 0){
-                write(1, &ch, 1);
-            }
-        }else{
-            char ch;
-            while(read(0, &ch, 1) > 0){
-                write(1, &ch, 1);
-            }
+        char ch;
+        while(read(file_in, &ch, 1) > 0){
+            write(file_out, &ch, 1);
         }
-
-
-
     }
 
-    
-    // cpm_options.infile
-    // cpm_options.outfile
-    
+
+    if(cpm_options.fast){
+        int file_in = open(cpm_options.infile, O_RDONLY);
+        if (file_in < 0) {
+            FatalError('B',"SUBOR NEEXISTUJE",21);
+        }
+        int file_out = open(cpm_options.outfile, O_CREAT | O_WRONLY);
+        struct stat s;
+        fstat(file_in,&s);
+        int size = s.st_size;
+        char ch[size];
+        read(file_in, &ch, size);
+        write(file_out, &ch, size);
+    }
+
+
+
     //-------------------------------------------------------------------
     // Vypis adresara
     //-------------------------------------------------------------------
