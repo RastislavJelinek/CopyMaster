@@ -21,13 +21,17 @@ int main(int argc, char* argv[])
     
     // Vypis hodnot prepinacov odstrante z finalnej verzie
     
-    PrintCopymasterOptions(&cpm_options);
+    //PrintCopymasterOptions(&cpm_options);
     
     //-------------------------------------------------------------------
     // Osetrenie prepinacov pred kopirovanim
     //-------------------------------------------------------------------
     
     if (cpm_options.fast && cpm_options.slow) {
+        fprintf(stderr, "CHYBA PREPINACOV\n"); 
+        exit(EXIT_FAILURE);
+    }
+    if (cpm_options.create && cpm_options.overwrite) {
         fprintf(stderr, "CHYBA PREPINACOV\n"); 
         exit(EXIT_FAILURE);
     }
@@ -40,33 +44,94 @@ int main(int argc, char* argv[])
     
     // TODO Implementovat kopirovanie suborov
 
+    //open input file
+    int file_in = open(cpm_options.infile, O_RDONLY);
+    int file_out;
+    if (file_in < 0) {
+        FatalError('B',"SUBOR NEEXISTUJE",21);
+    }
 
+    //get size and rights
+    struct stat s;
+    fstat(file_in,&s);
+    int size = s.st_size; 
+    mode_t input_mode = s.st_mode;
+
+
+
+
+    // no arg or -s --slow
     if(argc == 3 || cpm_options.slow){
-        int file_in = open(cpm_options.infile, O_RDONLY);
-        if (file_in < 0) {
-            FatalError('B',"SUBOR NEEXISTUJE",21);
-        }
-        int file_out = open(cpm_options.outfile, O_CREAT | O_WRONLY);
-
+        file_out = open(cpm_options.outfile, O_CREAT | O_WRONLY , input_mode);
         char ch;
         while(read(file_in, &ch, 1) > 0){
             write(file_out, &ch, 1);
         }
     }
 
-
+    // -f --fast
     if(cpm_options.fast){
-        int file_in = open(cpm_options.infile, O_RDONLY);
-        if (file_in < 0) {
-            FatalError('B',"SUBOR NEEXISTUJE",21);
-        }
-        int file_out = open(cpm_options.outfile, O_CREAT | O_WRONLY);
-        struct stat s;
-        fstat(file_in,&s);
-        int size = s.st_size;
+        file_out = open(cpm_options.outfile, O_CREAT | O_WRONLY, input_mode);
         char ch[size];
         read(file_in, &ch, size);
         write(file_out, &ch, size);
+    }
+
+    // -c (0644) --create
+    if(cpm_options.create){
+        file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, cpm_options.create_mode);
+        if (file_out < 0) {
+            FatalError('B',"SUBOR EXISTUJE",23);
+        }
+        char ch[size];
+        read(file_in, &ch, size);
+        write(file_out, &ch, size);
+    }
+
+    // -o --overwrite
+    if(cpm_options.overwrite){
+        file_out = open(cpm_options.outfile, O_TRUNC | O_WRONLY);
+        if (file_out < 0) {
+            FatalError('B',"SUBOR NEEXISTUJE",24);
+        }
+        char ch[size];
+        read(file_in, &ch, size);
+        write(file_out, &ch, size);
+    } 
+
+    if(cpm_options.append){
+        int file_out = open(cpm_options.outfile, O_WRONLY | O_APPEND);
+        if (file_out < 0) {
+            FatalError('B',"SUBOR NEEXISTUJE",22);
+        }
+        char ch[size];
+        read(file_in, &ch, size);
+        write(file_out, &ch, size);
+    }
+
+    if(cpm_options.lseek){
+        int file_out = open(cpm_options.outfile, O_WRONLY);
+        if (file_out < 0) {
+            FatalError('B',"SUBOR NEEXISTUJE",33);
+        }
+        int a = lseek(file_in, cpm_options.lseek_options.pos1, SEEK_CUR);
+        printf("%d",a);
+
+        /*if( < 0){
+            FatalError('B',"CHYBA POZICIE infile",33);
+        }*/
+
+        if(lseek(file_out, cpm_options.lseek_options.pos2, cpm_options.lseek_options.x) < 0){
+            FatalError('B',"CHYBA POZICIE outfile",33);
+        }
+
+
+
+        size = cpm_options.lseek_options.num;
+        char ch[size];
+        read(file_in, &ch, size);
+        write(file_out, &ch, size);
+        
     }
 
 
@@ -76,7 +141,6 @@ int main(int argc, char* argv[])
     //-------------------------------------------------------------------
     
     if (cpm_options.directory) {
-        fprintf(stdout, "kooook\n");
         FatalError(cpm_options.directory,"INA CHYBA",23);
         // TODO Implementovat vypis adresara
     }
@@ -87,6 +151,8 @@ int main(int argc, char* argv[])
    
     // TODO Implementovat osetrenie prepinacov po kopirovani
     
+    close(file_in);
+    close(file_out);
     return 0;
 }
 
@@ -98,7 +164,7 @@ void FatalError(char c, const char* msg, int exit_status)
     fprintf(stderr, "%c:%s\n", c, msg);
     exit(exit_status);
 }
-
+/*
 void PrintCopymasterOptions(struct CopymasterOptions* cpm_options)
 {
     if (cpm_options == 0)
@@ -141,3 +207,4 @@ void PrintCopymasterOptions(struct CopymasterOptions* cpm_options)
     printf("truncate_size: %ld\n", cpm_options->truncate_size);
     printf("sparse:        %d\n", cpm_options->sparse);
 }
+*/

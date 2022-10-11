@@ -20,6 +20,7 @@
 
 ## 3. týždeň
 ### Report
+začiatok práce, pridanie preppínačov bez, -f -s, -o, -a, rozpracovanie prepinacov -c a -l
 - 
 ### Otázky
 - 
