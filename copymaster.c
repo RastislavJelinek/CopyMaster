@@ -58,10 +58,10 @@ int main(int argc, char* argv[])
     mode_t input_mode = s.st_mode;
 
     if(cpm_options.inode && !S_ISREG(s.st_mode)){
-        FatalError('i',"ZLY TYP VSTUPNEHO SUBORU",34);
+        FatalError('i',"ZLY TYP VSTUPNEHO SUBORU",27);
     }
     if(cpm_options.inode && s.st_ino != cpm_options.inode_number){
-        FatalError('i',"ZLY INODE",34);
+        FatalError('i',"ZLY INODE",27);
     }
 
 
@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
 
     // -f --fast
     if(cpm_options.fast){
-        file_out = open(cpm_options.outfile, O_TRUNC | O_CREAT | O_WRONLY, input_mode);
+        file_out = open(cpm_options.outfile, O_CREAT | O_WRONLY, input_mode);
         char ch[size];
         read(file_in, &ch, size);
         write(file_out, &ch, size);
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
     // Osetrenie prepinacov po kopirovani
     //-------------------------------------------------------------------
     
-    if(cpm_options.delete_opt && !S_ISREG(s.st_mode)){
+    if(cpm_options.delete_opt && S_ISREG(s.st_mode)){
         if (remove(file_in) != 0) {
             FatalError('d',"SUBOR NEBOL ZMAZANY",26);
         }
