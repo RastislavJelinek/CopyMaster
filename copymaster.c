@@ -162,8 +162,19 @@ int main(int argc, char* argv[])
     //-------------------------------------------------------------------
     // Osetrenie prepinacov po kopirovani
     //-------------------------------------------------------------------
-   
-    // TODO Implementovat osetrenie prepinacov po kopirovani
+    
+    if(cpm_options.delete_opt && !S_ISREG(s.st_mode)){
+        if (remove(file_in) != 0) {
+            FatalError('d',"SUBOR NEBOL ZMAZANY",26);
+        }
+
+    }
+
+
+
+
+
+
     
     close(file_in);
     close(file_out);
