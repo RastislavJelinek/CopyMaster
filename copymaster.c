@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 
     // no arg or -s --slow
     if(argc == 3 || cpm_options.slow){
-        file_out = open(cpm_options.outfile, O_CREAT | O_WRONLY , input_mode);
+        file_out = open(cpm_options.outfile, O_TRUNC | O_CREAT | O_WRONLY , input_mode);
         char ch;
         while(read(file_in, &ch, 1) > 0){
             write(file_out, &ch, 1);
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 
     // -f --fast
     if(cpm_options.fast){
-        file_out = open(cpm_options.outfile, O_CREAT | O_WRONLY, input_mode);
+        file_out = open(cpm_options.outfile, O_TRUNC | O_CREAT | O_WRONLY, input_mode);
         char ch[size];
         read(file_in, &ch, size);
         write(file_out, &ch, size);
@@ -99,6 +99,7 @@ int main(int argc, char* argv[])
         write(file_out, &ch, size);
     } 
 
+    // -a --append
     if(cpm_options.append){
         int file_out = open(cpm_options.outfile, O_WRONLY | O_APPEND);
         if (file_out < 0) {
@@ -109,6 +110,7 @@ int main(int argc, char* argv[])
         write(file_out, &ch, size);
     }
 
+    // -l --lseek
     if(cpm_options.lseek){
         int file_out = open(cpm_options.outfile, O_WRONLY);
         if (file_out < 0) {
