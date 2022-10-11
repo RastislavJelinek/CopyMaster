@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
     int size = s.st_size; 
     mode_t input_mode = s.st_mode;
 
-    if(!S_ISREG(s.st_mode)){
+    if(cpm_options.inode && !S_ISREG(s.st_mode)){
         FatalError('i',"ZLY TYP VSTUPNEHO SUBORU",34);
     }
     if(cpm_options.inode && s.st_ino != cpm_options.inode_number){
