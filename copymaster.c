@@ -55,11 +55,25 @@ int main(int argc, char* argv[])
 
 
     //open input file
-    int file_in = open(cpm_options.infile, O_RDONLY);
-    int file_out;
-    if (file_in == -1) {
-        FatalError('B',"SUBOR NEEXISTUJE",21);
+    int file_in;
+    if(cpm_options.truncate){
+        if (access(cpm_options.outfile, F_OK) == 0 && access(cpm_options.outfile, W_OK) != 0 && access(cpm_options.outfile, R_OK) != 0) {
+            FatalError('B',"INA CHYBA",30);
+        }
+        file_in = open(cpm_options.infile, O_RDWR);
+    }else{
+        if (access(cpm_options.outfile, F_OK) != 0){ 
+            FatalError('B',"SUBOR NEEXISTUJE",21);
+        }
+        if(access(cpm_options.outfile, R_OK) != 0) {
+            FatalError('B',"INA CHYBA",21);
+        }
+        file_in = open(cpm_options.infile, O_RDONLY);
     }
+    
+    
+    
+    int file_out;
 
     //get size and rights
     struct stat s;
@@ -77,7 +91,7 @@ int main(int argc, char* argv[])
     
 
     // no arg || -s --slow || -f --fast || -i --inode
-    if(argc == 3 || cpm_options.slow || cpm_options.fast || cpm_options.delete_opt){
+    if(argc == 3 || cpm_options.slow || cpm_options.fast || cpm_options.delete_opt || cpm_options.truncate){
         if (access(cpm_options.outfile, F_OK) == 0 && access(cpm_options.outfile, W_OK) != 0) {
             FatalError('B',"INA CHYBA",21);
         }
@@ -144,11 +158,23 @@ int main(int argc, char* argv[])
         read(file_in, &ch, size);
         write(file_out, &ch, size);
     }
+
+
+
+    if (cpm_options.truncate) {
+        if(cpm_options.truncate_size < 0){
+            FatalError(cpm_options.truncate,"ZAPORNA VELKOST",31);
+        }
+
+        if(ftruncate(file_in, cpm_options.truncate_size) != 0){
+            FatalError(cpm_options.truncate,"INA CHYBA",31);
+        }
+    }
     close(file_in);
     close(file_out);
 
     
-
+    
     //-------------------------------------------------------------------
     // Vypis adresara
     //-------------------------------------------------------------------
@@ -163,14 +189,20 @@ int main(int argc, char* argv[])
     //-------------------------------------------------------------------
     
     // -k --link /---/ make hard link to file
-    if(cpm_options.link){
+    /*if(cpm_options.link){
         
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
+    }*/
+
+    if (cpm_options.chmod) {
+        if(chmod( cpm_options.outfile, cpm_options.chmod_mode) != 0){
+            FatalError(cpm_options.chmod,"ZLE PRAVA",34);
+        }
     }
 
-
+    
 
     if(cpm_options.delete_opt && S_ISREG(s.st_mode)){
         if (remove(cpm_options.infile) != 0) {
@@ -187,6 +219,7 @@ void FatalError(char c, const char* msg, int exit_status)
     fprintf(stderr, "%c:%d\n", c, errno); 
     fprintf(stderr, "%c:%s\n", c, strerror(errno));
     fprintf(stderr, "%c:%s\n", c, msg);
+    fprintf(stderr, "%c:%d\n", c, exit_status);
     exit(exit_status);
 }
 /*
