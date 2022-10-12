@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <dirent.h>
-#include <io.h>
 
 #include "options.h"
 
@@ -47,11 +46,11 @@ int main(int argc, char* argv[])
     }
 
     //-u --unmask
-    if (cpm_options.umask) {
+    /*if (cpm_options.umask) {
         if(umask(cpm_options.umask_options) != 0){
             FatalError(cpm_options.umask,"INA CHYBA",32);
         }
-    }
+    }*/
     
     
     //-------------------------------------------------------------------
@@ -208,7 +207,7 @@ int main(int argc, char* argv[])
     }
 
 
-
+    //problematic on windows
     //-t --truncate
     if (cpm_options.truncate) {
         if(cpm_options.truncate_size < 0){
@@ -219,8 +218,6 @@ int main(int argc, char* argv[])
             FatalError(cpm_options.truncate,"INA CHYBA",31);
         }
     }
-
-
     // -k --link /---/ make hard link to file
     if(cpm_options.link){
         
@@ -228,6 +225,14 @@ int main(int argc, char* argv[])
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
     }
+
+
+
+
+
+
+
+
 
     //- m (0777) --chmod
     if (cpm_options.chmod) {
