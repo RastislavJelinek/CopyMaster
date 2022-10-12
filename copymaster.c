@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
 
-    if(cpm_options.link && !access(cpm_options.infile, F_OK)){
+    if(cpm_options.link && access(cpm_options.infile, F_OK) == -1){
         FatalError('k',"VSTUPNY SUBOR NEEXISTUJE",30);
     }
     if(cpm_options.link && access(cpm_options.outfile, F_OK)){
@@ -189,8 +189,6 @@ int main(int argc, char* argv[])
 
 
         //FatalError(cpm_options.directory,"INA CHYBA",23);
-
-        // TODO Implementovat vypis adresara
     }
         
     //-------------------------------------------------------------------
@@ -211,7 +209,7 @@ int main(int argc, char* argv[])
 
 
     //-t --truncate
-    if (cpm_options.truncate) {
+    /*if (cpm_options.truncate) {
         if(cpm_options.truncate_size < 0){
             FatalError(cpm_options.truncate,"ZAPORNA VELKOST",31);
         }
@@ -228,7 +226,7 @@ int main(int argc, char* argv[])
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
-    }
+    }*/
 
     //- m (0777) --chmod
     if (cpm_options.chmod) {
