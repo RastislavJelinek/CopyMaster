@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
 
     // -a --append
     if(cpm_options.append){
-        int file_out = open(cpm_options.outfile, O_WRONLY | O_APPEND);
+        int file_out = open(cpm_options.outfile, O_APPEND | O_WRONLY);
         if (file_out == -1) {
             FatalError(cpm_options.append,"SUBOR NEEXISTUJE",22);
         }
