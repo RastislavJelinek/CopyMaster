@@ -44,6 +44,13 @@ int main(int argc, char* argv[])
     if(cpm_options.link && access(cpm_options.outfile, F_OK)){
         FatalError('k',"VYSTUPNY SUBOR UZ EXISTUJE",30);
     }
+
+    //-u --unmask
+    /*if (cpm_options.umask) {
+        if(umask(cpm_options.umask_options) != 0){
+            FatalError(cpm_options.umask,"INA CHYBA",32);
+        }
+    }*/
     
     
     //-------------------------------------------------------------------
@@ -76,6 +83,7 @@ int main(int argc, char* argv[])
     
 
     int file_out = -1;
+
 
     // -c (0644) --create TODO doriesit prava
     if(cpm_options.create){
@@ -127,6 +135,8 @@ int main(int argc, char* argv[])
         
     }
 
+
+
     // no arg || -s --slow || -f --fast || -i --inode
     if(file_out == -1){
         if (access(cpm_options.outfile, F_OK) == 0 && access(cpm_options.outfile, W_OK) != 0) {
@@ -134,6 +144,7 @@ int main(int argc, char* argv[])
         }
         file_out = open(cpm_options.outfile, O_TRUNC | O_CREAT | O_WRONLY , input_mode);
     }
+
 
     //-s --slow
     if(cpm_options.slow){
@@ -160,21 +171,44 @@ int main(int argc, char* argv[])
     //-------------------------------------------------------------------
     
     if (cpm_options.directory) {
+
+
+        /*char *directory = "MyDirectory";
+        size_t directory_length = strlen(directory);
+        char *path = malloc(directory_length + 1 + NAME_MAX);
+        strcpy(path, directory);
+        path[directory_length] = '/';
+        while ((pDirent = readdir(pDir)) != NULL) {
+            strcpy(path + directory_length + 1, pDirent->d_name);
+            if (stat(path, &vStat) == -1) {
+                perror(path);
+                continue;
+            }
+        }*/
+
+        /*
         DIR *d;
         struct dirent *t;
-        if(d = fdopendir(cpm_options.directory) == NULL){
+
+        if((d = opendir(cpm_options.infile)) == NULL){
             FatalError(cpm_options.directory,"VSTUPNY SUBOR NIE JE ADRESAR",23);
         }
 
-        while((t = readdir(d))!= NULL){
-            printf("%u %s\n",t->d_type,t->d_name);
+        struct stat s;
+        /*int size;
+        mode_t input_mode;*/
+        /*while((t = readdir(d)) != NULL){
+            stat(&t,&s);*/
+            /*size = s.st_size; 
+            input_mode = s.st_mode;
+            fprintf(cpm_options.outfile,"%u %s\n",t->d_type,t->d_name ,t.);*/
         }
 
 
         //FatalError(cpm_options.directory,"INA CHYBA",23);
 
         // TODO Implementovat vypis adresara
-    }
+    //}
         
     //-------------------------------------------------------------------
     // Osetrenie prepinacov po kopirovani
@@ -188,7 +222,7 @@ int main(int argc, char* argv[])
 
 
     //-t --truncate
-    /*if (cpm_options.truncate) {
+    if (cpm_options.truncate) {
         if(cpm_options.truncate_size < 0){
             FatalError(cpm_options.truncate,"ZAPORNA VELKOST",31);
         }
@@ -205,7 +239,7 @@ int main(int argc, char* argv[])
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
-    }*/
+    }
 
     if (cpm_options.chmod) {
         if(chmod( cpm_options.outfile, cpm_options.chmod_mode) != 0){
