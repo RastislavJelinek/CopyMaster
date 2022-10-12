@@ -211,7 +211,7 @@ int main(int argc, char* argv[])
 
 
     //-t --truncate
-    /*if (cpm_options.truncate) {
+    if (cpm_options.truncate) {
         if(cpm_options.truncate_size < 0){
             FatalError(cpm_options.truncate,"ZAPORNA VELKOST",31);
         }
@@ -228,7 +228,7 @@ int main(int argc, char* argv[])
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
-    }*/
+    }
 
     //- m (0777) --chmod
     if (cpm_options.chmod) {
