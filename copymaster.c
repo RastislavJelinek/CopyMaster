@@ -278,7 +278,7 @@ int main(int argc, char* argv[])
             }
             permision[10] = '\0';
             strftime(MY_TIME, 100, "%d-%m-%Y", localtime( &s.st_mtime));
-            fprintf(stdout,"%s %d %d %d %lu %s %s\n",permision,s.st_nlink, s.st_uid, s.st_gid, s.st_size, MY_TIME, t->d_name);
+            fprintf(1,"%s %d %d %d %lu %s %s\n",permision,s.st_nlink, s.st_uid, s.st_gid, s.st_size, MY_TIME, t->d_name);
         }
 
 
