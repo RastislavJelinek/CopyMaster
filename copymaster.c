@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include<unistd.h>
 
 
 #include "options.h"
@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
     // -k --link /---/ make hard link to file
     if(cpm_options.link){
         
-        if (  link(cpm_options.infile, cpm_options.outfile) != 0) {
+        if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
     }
