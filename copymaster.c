@@ -4,7 +4,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include<unistd.h>
+#include <unistd.h>
 
 
 #include "options.h"
@@ -161,17 +161,19 @@ int main(int argc, char* argv[])
 
 
 
+    
+    close(file_in);
+    close(file_out);
+
     if (cpm_options.truncate) {
         if(cpm_options.truncate_size < 0){
             FatalError(cpm_options.truncate,"ZAPORNA VELKOST",31);
         }
 
-        if(ftruncate(file_in, cpm_options.truncate_size) != 0){
+        if(truncate(cpm_options.infile, cpm_options.truncate_size) != 0){
             FatalError(cpm_options.truncate,"INA CHYBA",31);
         }
     }
-    close(file_in);
-    close(file_out);
 
     
     
@@ -189,12 +191,12 @@ int main(int argc, char* argv[])
     //-------------------------------------------------------------------
     
     // -k --link /---/ make hard link to file
-    /*if(cpm_options.link){
+    if(cpm_options.link){
         
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
-    }*/
+    }
 
     if (cpm_options.chmod) {
         if(chmod( cpm_options.outfile, cpm_options.chmod_mode) != 0){
