@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
 
     // -a --append
     if(cpm_options.append){
-        int file_out = open(cpm_options.outfile, O_APPEND | O_WRONLY);
+        file_out = open(cpm_options.outfile, O_APPEND | O_WRONLY);
         if (file_out == -1) {
             FatalError(cpm_options.append,"SUBOR NEEXISTUJE",22);
         }
@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
 
     // -l --lseek
     if(cpm_options.lseek){
-        int file_out = open(cpm_options.outfile, O_WRONLY); 
+        file_out = open(cpm_options.outfile, O_WRONLY); 
         if (file_out == -1) {
             FatalError(cpm_options.lseek,"SUBOR NEEXISTUJE",33);
         }
@@ -159,8 +159,7 @@ int main(int argc, char* argv[])
     }
 
     
-    close(file_in);
-    close(file_out);
+    
 
     
 
@@ -171,22 +170,6 @@ int main(int argc, char* argv[])
     //-------------------------------------------------------------------
     
     if (cpm_options.directory) {
-
-
-        /*char *directory = "MyDirectory";
-        size_t directory_length = strlen(directory);
-        char *path = malloc(directory_length + 1 + NAME_MAX);
-        strcpy(path, directory);
-        path[directory_length] = '/';
-        while ((pDirent = readdir(pDir)) != NULL) {
-            strcpy(path + directory_length + 1, pDirent->d_name);
-            if (stat(path, &vStat) == -1) {
-                perror(path);
-                continue;
-            }
-        }*/
-
-        /*
         DIR *d;
         struct dirent *t;
 
@@ -195,24 +178,30 @@ int main(int argc, char* argv[])
         }
 
         struct stat s;
-        /*int size;
-        mode_t input_mode;*/
-        /*while((t = readdir(d)) != NULL){
-            stat(&t,&s);*/
-            /*size = s.st_size; 
+        //mode_t input_mode;
+        while((t = readdir(d)) != NULL){
+            stat(t->d_name,&s);
+            size = s.st_size; 
             input_mode = s.st_mode;
-            fprintf(cpm_options.outfile,"%u %s\n",t->d_type,t->d_name ,t.);*/
+
+            fprintf(stdout,"%ld %u %s\n",s.st_atime,t->d_type,t->d_name);
         }
 
 
         //FatalError(cpm_options.directory,"INA CHYBA",23);
 
         // TODO Implementovat vypis adresara
-    //}
+    }
         
     //-------------------------------------------------------------------
     // Osetrenie prepinacov po kopirovani
     //-------------------------------------------------------------------
+
+    close(file_in);
+    close(file_out);
+
+
+
     if (cpm_options.chmod) {
         if(chmod(cpm_options.outfile, cpm_options.chmod_mode) != 0){
             FatalError(cpm_options.truncate,"INA CHYBA",34);
@@ -222,7 +211,7 @@ int main(int argc, char* argv[])
 
 
     //-t --truncate
-    if (cpm_options.truncate) {
+    /*if (cpm_options.truncate) {
         if(cpm_options.truncate_size < 0){
             FatalError(cpm_options.truncate,"ZAPORNA VELKOST",31);
         }
@@ -239,7 +228,7 @@ int main(int argc, char* argv[])
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
-    }
+    }*/
 
     if (cpm_options.chmod) {
         if(chmod( cpm_options.outfile, cpm_options.chmod_mode) != 0){
