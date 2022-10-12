@@ -3,10 +3,12 @@
 #include <errno.h>
 #include <string.h>
 #include <fcntl.h>
-#include <sys/stat.h>
 #include <unistd.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+
+#include <time.h>
 
 #include "options.h"
 
@@ -56,14 +58,14 @@ int main(int argc, char* argv[])
     //-------------------------------------------------------------------
     // Kopirovanie suborov
     //-------------------------------------------------------------------
-    
+  
     //open input file
     if (access(cpm_options.infile, F_OK) != 0){ 
         FatalError('B',"SUBOR NEEXISTUJE",21);
     }
-    if(access(cpm_options.infile, R_OK) != 0 && access(cpm_options.infile, W_OK) != 0) {
+    /*if(access(cpm_options.infile, R_OK) != 0 && access(cpm_options.infile, W_OK) != 0) {
         FatalError('B',"INA CHYBA",21);
-    }
+    }*/
     int file_in = -1;
 
 
@@ -166,47 +168,10 @@ int main(int argc, char* argv[])
         write(file_out, &ch, size);
     }
 
-    
-    
 
     
 
     
-    
-    //-------------------------------------------------------------------
-    // Vypis adresara
-    //-------------------------------------------------------------------
-    
-    if (cpm_options.directory) {
-        DIR *d;
-        struct dirent *t;
-
-        if((d = opendir(cpm_options.infile)) == NULL){
-            FatalError(cpm_options.directory,"VSTUPNY SUBOR NIE JE ADRESAR",23);
-        }
-
-        struct stat s;
-        //mode_t input_mode;
-        while((t = readdir(d)) != NULL){
-            stat(t->d_name,&s);
-            size = s.st_size; 
-            input_mode = s.st_mode;
-
-            fprintf(stdout,"%ld %u %s\n",s.st_atime,t->d_type,t->d_name);
-        }
-
-
-        //FatalError(cpm_options.directory,"INA CHYBA",23);
-    }
-        
-    //-------------------------------------------------------------------
-    // Osetrenie prepinacov po kopirovani
-    //-------------------------------------------------------------------
-    
-    
-
-
-
     if (cpm_options.chmod) {
         if(chmod(cpm_options.outfile, cpm_options.chmod_mode) != 0){
             FatalError(cpm_options.truncate,"INA CHYBA",34);
@@ -235,6 +200,100 @@ int main(int argc, char* argv[])
     }*/
     close(file_in);
     close(file_out);
+    
+    
+    //-------------------------------------------------------------------
+    // Vypis adresara
+    //-------------------------------------------------------------------
+    
+    if (cpm_options.directory) {
+        DIR *d;
+        struct dirent *t;
+
+        if((d = opendir(cpm_options.infile)) == NULL){
+            FatalError(cpm_options.directory,"VSTUPNY SUBOR NIE JE ADRESAR",23);
+        }
+
+        struct stat s;
+        char MY_TIME[50];
+        while((t = readdir(d)) != NULL){
+            stat(t->d_name,&s);
+            size = s.st_size; 
+            input_mode = s.st_mode;
+
+            char permision[11] = {0};
+            if( S_ISREG(s.st_mode) )
+                permision[0] = '-';
+            else
+                permision[0] = 'd';
+
+            //Owner permissions:
+            if( s.st_mode & S_IRUSR ){
+                permision[1] = 'r';
+            }else{
+                permision[1] = '-';
+            }
+            if( s.st_mode & S_IWUSR ){
+                permision[2] = 'w';
+            }else{
+                permision[2] = '-';
+            }
+            if( s.st_mode & S_IXUSR ){
+                permision[3] = 'x';
+            }else{
+                permision[3] = '-';
+            }
+            //Group permissions:
+            if( s.st_mode & S_IRGRP ){
+                permision[4] = 'r';
+            }else{
+                permision[4] = '-';
+            }
+            if( s.st_mode & S_IWGRP ){
+                permision[5] = 'w';
+            }else{
+                permision[5] = '-';
+            }
+            if( s.st_mode & S_IXGRP ){
+                permision[6] = 'x';
+            }else{
+                permision[6] = '-';
+            }
+
+            //Others permissions:
+            if( s.st_mode & S_IROTH ){
+                permision[7] = 'r';
+            }else{
+                permision[7] = '-';
+            }
+            if( s.st_mode & S_IWOTH ){
+                permision[8] = 'w';
+            }else{
+                permision[8] = '-';
+            }
+            if( s.st_mode & S_IXOTH ){
+                permision[9] = 'x';
+            }else{
+                permision[9] = '-';
+            }
+            permision[10] = '\0';
+            strftime(MY_TIME, 100, "%d-%m-%Y", localtime( &s.st_mtime));
+            fprintf(stdout,"%s %d %d %d %ld %s %s\n",permision,s.st_nlink, s.st_uid, s.st_gid, s.st_size, MY_TIME, t->d_name);
+        }
+
+
+        //FatalError(cpm_options.directory,"INA CHYBA",23);
+    }
+        
+    //-------------------------------------------------------------------
+    // Osetrenie prepinacov po kopirovani
+    //-------------------------------------------------------------------
+    
+    
+
+
+
+    
 
 
 
