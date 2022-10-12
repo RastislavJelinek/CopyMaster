@@ -36,48 +36,32 @@ int main(int argc, char* argv[])
         fprintf(stderr, "CHYBA PREPINACOV\n"); 
         exit(EXIT_FAILURE);
     }
-    
-    // TODO Nezabudnut dalsie kontroly kombinacii prepinacov ...
-    
-    //-------------------------------------------------------------------
-    // Kopirovanie suborov
-    //-------------------------------------------------------------------
-    
-    // TODO Implementovat kopirovanie suborov
+
     if(cpm_options.link && !access(cpm_options.infile, F_OK)){
         FatalError('k',"VSTUPNY SUBOR NEEXISTUJE",30);
     }
     if(cpm_options.link && access(cpm_options.outfile, F_OK)){
         FatalError('k',"VYSTUPNY SUBOR UZ EXISTUJE",30);
     }
-
-
-
-
+    
+    
+    //-------------------------------------------------------------------
+    // Kopirovanie suborov
+    //-------------------------------------------------------------------
+    
     //open input file
-    int file_in;
-    if(cpm_options.truncate){
-        if (access(cpm_options.infile, F_OK) == 0 && access(cpm_options.infile, W_OK) != 0 && access(cpm_options.infile, R_OK) != 0) {
-            FatalError('B',"INA CHYBA",30);
-        }
-        file_in = open(cpm_options.infile, O_RDWR);
-    }else{
-        if (access(cpm_options.infile, F_OK) != 0){ 
-            FatalError('B',"SUBOR NEEXISTUJE",21);
-        }
-        if(access(cpm_options.infile, R_OK) != 0) {
-            FatalError('B',"INA CHYBA",21);
-        }
-        file_in = open(cpm_options.infile, O_RDONLY);
+    if (access(cpm_options.infile, F_OK) != 0){ 
+        FatalError('B',"SUBOR NEEXISTUJE",21);
     }
+    if(access(cpm_options.infile, R_OK) != 0) {
+        FatalError('B',"INA CHYBA",21);
+    }
+    int file_in = -1;
+    file_in = open(cpm_options.infile, O_RDONLY);
     
-    
-    
-    int file_out;
-
     //get size and rights
     struct stat s;
-    stat(file_in,&s);
+    fstat(file_in,&s);
     int size = s.st_size; 
     mode_t input_mode = s.st_mode;
 
@@ -90,13 +74,7 @@ int main(int argc, char* argv[])
 
     
 
-    // no arg || -s --slow || -f --fast || -i --inode
-    if(argc == 3 || cpm_options.slow || cpm_options.fast || cpm_options.delete_opt || cpm_options.truncate){
-        if (access(cpm_options.outfile, F_OK) == 0 && access(cpm_options.outfile, W_OK) != 0) {
-            FatalError('B',"INA CHYBA",21);
-        }
-        file_out = open(cpm_options.outfile, O_TRUNC | O_CREAT | O_WRONLY , input_mode);
-    }
+    int file_out = -1;
 
     // -c (0644) --create TODO doriesit prava
     if(cpm_options.create){
@@ -117,16 +95,17 @@ int main(int argc, char* argv[])
 
     // -a --append
     if(cpm_options.append){
-        int file_out = open(cpm_options.outfile, O_APPEND | O_WRONLY);
+        int file_out = open(cpm_options.outfile, O_WRONLY | O_APPEND);
         if (file_out == -1) {
             FatalError(cpm_options.append,"SUBOR NEEXISTUJE",22);
         }
         
+
     }
 
     // -l --lseek
     if(cpm_options.lseek){
-        int file_out = open(cpm_options.outfile, O_WRONLY);
+        int file_out = open(cpm_options.outfile, O_WRONLY); 
         if (file_out == -1) {
             FatalError(cpm_options.lseek,"SUBOR NEEXISTUJE",33);
         }
@@ -147,7 +126,15 @@ int main(int argc, char* argv[])
         
     }
 
+    // no arg || -s --slow || -f --fast || -i --inode
+    if(file_out == -1){
+        if (access(cpm_options.outfile, F_OK) == 0 && access(cpm_options.outfile, W_OK) != 0) {
+            FatalError('B',"INA CHYBA",21);
+        }
+        file_out = open(cpm_options.outfile, O_TRUNC | O_CREAT | O_WRONLY , input_mode);
+    }
 
+    //-s --slow
     if(cpm_options.slow){
         char ch;
         while(read(file_in, &ch, 1) > 0){
@@ -159,21 +146,11 @@ int main(int argc, char* argv[])
         write(file_out, &ch, size);
     }
 
-
-
     
     close(file_in);
     close(file_out);
 
-    if (cpm_options.truncate) {
-        if(cpm_options.truncate_size < 0){
-            FatalError(cpm_options.truncate,"ZAPORNA VELKOST",31);
-        }
-
-        if(truncate(cpm_options.infile, cpm_options.truncate_size) != 0){
-            FatalError(cpm_options.truncate,"INA CHYBA",31);
-        }
-    }
+    
 
     
     
@@ -190,13 +167,28 @@ int main(int argc, char* argv[])
     // Osetrenie prepinacov po kopirovani
     //-------------------------------------------------------------------
     
+
+
+
+    //-t --truncate
+    /*if (cpm_options.truncate) {
+        if(cpm_options.truncate_size < 0){
+            FatalError(cpm_options.truncate,"ZAPORNA VELKOST",31);
+        }
+
+        if(truncate(cpm_options.infile, cpm_options.truncate_size) != 0){
+            FatalError(cpm_options.truncate,"INA CHYBA",31);
+        }
+    }*/
+
+
     // -k --link /---/ make hard link to file
-    if(cpm_options.link){
+    /*if(cpm_options.link){
         
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
-    }
+    }*/
 
     if (cpm_options.chmod) {
         if(chmod( cpm_options.outfile, cpm_options.chmod_mode) != 0){
