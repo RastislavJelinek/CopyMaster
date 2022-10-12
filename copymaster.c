@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <io.h>
 
 #include "options.h"
 
@@ -41,16 +42,16 @@ int main(int argc, char* argv[])
     if(cpm_options.link && access(cpm_options.infile, F_OK) == -1){
         FatalError('k',"VSTUPNY SUBOR NEEXISTUJE",30);
     }
-    if(cpm_options.link && access(cpm_options.outfile, F_OK)){
+    if(cpm_options.link && access(cpm_options.outfile, F_OK) != -1){
         FatalError('k',"VYSTUPNY SUBOR UZ EXISTUJE",30);
     }
 
     //-u --unmask
-    /*if (cpm_options.umask) {
+    if (cpm_options.umask) {
         if(umask(cpm_options.umask_options) != 0){
             FatalError(cpm_options.umask,"INA CHYBA",32);
         }
-    }*/
+    }
     
     
     //-------------------------------------------------------------------
@@ -209,7 +210,7 @@ int main(int argc, char* argv[])
 
 
     //-t --truncate
-    /*if (cpm_options.truncate) {
+    if (cpm_options.truncate) {
         if(cpm_options.truncate_size < 0){
             FatalError(cpm_options.truncate,"ZAPORNA VELKOST",31);
         }
@@ -226,7 +227,7 @@ int main(int argc, char* argv[])
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
-    }*/
+    }
 
     //- m (0777) --chmod
     if (cpm_options.chmod) {
