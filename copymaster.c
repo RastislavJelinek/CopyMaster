@@ -5,7 +5,8 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
+#include <sys/types.h>
+#include <dirent.h>
 
 #include "options.h"
 
@@ -159,19 +160,35 @@ int main(int argc, char* argv[])
     //-------------------------------------------------------------------
     
     if (cpm_options.directory) {
-        FatalError(cpm_options.directory,"INA CHYBA",23);
+        DIR *d;
+        struct dirent *t;
+        if(d = fdopendir(cpm_options.directory) == NULL){
+            FatalError(cpm_options.directory,"VSTUPNY SUBOR NIE JE ADRESAR",23);
+        }
+
+        while((t = readdir(d))!= NULL){
+            printf("%u %s\n",t->d_type,t->d_name);
+        }
+
+
+        //FatalError(cpm_options.directory,"INA CHYBA",23);
+
         // TODO Implementovat vypis adresara
     }
         
     //-------------------------------------------------------------------
     // Osetrenie prepinacov po kopirovani
     //-------------------------------------------------------------------
-    
+    if (cpm_options.chmod) {
+        if(chmod(cpm_options.outfile, cpm_options.chmod_mode) != 0){
+            FatalError(cpm_options.truncate,"INA CHYBA",34);
+        }
+    }
 
 
 
     //-t --truncate
-    if (cpm_options.truncate) {
+    /*if (cpm_options.truncate) {
         if(cpm_options.truncate_size < 0){
             FatalError(cpm_options.truncate,"ZAPORNA VELKOST",31);
         }
@@ -188,7 +205,7 @@ int main(int argc, char* argv[])
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
-    }
+    }*/
 
     if (cpm_options.chmod) {
         if(chmod( cpm_options.outfile, cpm_options.chmod_mode) != 0){
