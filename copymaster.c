@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
+
 #include "options.h"
 
 void FatalError(char c, const char* msg, int exit_status);
@@ -73,8 +74,10 @@ int main(int argc, char* argv[])
         FatalError('i',"ZLY INODE",27);
     }
 
-    // no arg || -s --slow || -f --fast
-    if(argc == 3 || cpm_options.slow || cpm_options.fast){
+    
+
+    // no arg || -s --slow || -f --fast || -i --inode
+    if(argc == 3 || cpm_options.slow || cpm_options.fast || cpm_options.delete_opt){
         if (access(cpm_options.outfile, F_OK) == 0 && access(cpm_options.outfile, W_OK) != 0) {
             FatalError('B',"INA CHYBA",21);
         }
@@ -161,8 +164,9 @@ int main(int argc, char* argv[])
     
     // -k --link /---/ make hard link to file
     if(cpm_options.link){
-        if (link(cpm_options.infile, cpm_options.outfile) != 0) {
-            FatalError(cpm_options.infile,"INA CHYBA",30);
+        
+        if (  link(cpm_options.infile, cpm_options.outfile) != 0) {
+            FatalError(cpm_options.link,"INA CHYBA",30);
         }
     }
 
