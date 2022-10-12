@@ -61,11 +61,19 @@ int main(int argc, char* argv[])
     if (access(cpm_options.infile, F_OK) != 0){ 
         FatalError('B',"SUBOR NEEXISTUJE",21);
     }
-    if(access(cpm_options.infile, R_OK) != 0) {
+    if(access(cpm_options.infile, R_OK) != 0 && access(cpm_options.infile, W_OK) != 0) {
         FatalError('B',"INA CHYBA",21);
     }
     int file_in = -1;
-    file_in = open(cpm_options.infile, O_RDONLY);
+
+
+    if(cpm_options.truncate){
+        file_in = open(cpm_options.infile, O_RDWR);
+    }else{
+        file_in = open(cpm_options.infile, O_RDONLY);
+    }
+
+    
     
     //get size and rights
     struct stat s;
@@ -194,9 +202,8 @@ int main(int argc, char* argv[])
     //-------------------------------------------------------------------
     // Osetrenie prepinacov po kopirovani
     //-------------------------------------------------------------------
-
-    close(file_in);
-    close(file_out);
+    
+    
 
 
 
@@ -206,27 +213,28 @@ int main(int argc, char* argv[])
         }
     }
 
-
+    
+    
     //problematic on windows
     //-t --truncate
     if (cpm_options.truncate) {
         if(cpm_options.truncate_size < 0){
             FatalError(cpm_options.truncate,"ZAPORNA VELKOST",31);
         }
-
-        if(truncate(cpm_options.infile, cpm_options.truncate_size) != 0){
+        if(ftruncate(file_in, cpm_options.truncate_size) != 0){
             FatalError(cpm_options.truncate,"INA CHYBA",31);
         }
     }
+    
     // -k --link /---/ make hard link to file
-    if(cpm_options.link){
+    /*if(cpm_options.link){
         
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
-    }
-
-
+    }*/
+    close(file_in);
+    close(file_out);
 
 
 
