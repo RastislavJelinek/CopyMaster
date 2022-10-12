@@ -57,15 +57,15 @@ int main(int argc, char* argv[])
     //open input file
     int file_in;
     if(cpm_options.truncate){
-        if (access(cpm_options.outfile, F_OK) == 0 && access(cpm_options.outfile, W_OK) != 0 && access(cpm_options.outfile, R_OK) != 0) {
+        if (access(cpm_options.infile, F_OK) == 0 && access(cpm_options.infile, W_OK) != 0 && access(cpm_options.infile, R_OK) != 0) {
             FatalError('B',"INA CHYBA",30);
         }
         file_in = open(cpm_options.infile, O_RDWR);
     }else{
-        if (access(cpm_options.outfile, F_OK) != 0){ 
+        if (access(cpm_options.infile, F_OK) != 0){ 
             FatalError('B',"SUBOR NEEXISTUJE",21);
         }
-        if(access(cpm_options.outfile, R_OK) != 0) {
+        if(access(cpm_options.infile, R_OK) != 0) {
             FatalError('B',"INA CHYBA",21);
         }
         file_in = open(cpm_options.infile, O_RDONLY);
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 
     //get size and rights
     struct stat s;
-    fstat(file_in,&s);
+    stat(file_in,&s);
     int size = s.st_size; 
     mode_t input_mode = s.st_mode;
 
