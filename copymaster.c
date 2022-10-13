@@ -48,8 +48,9 @@ int main(int argc, char* argv[])
     }
 
     //-u --unmask
+    printf("%c",cpm_options.umask_options[1][0]);
     /*if (cpm_options.umask) {
-        if(umask(cpm_options.umask_options) != 0){
+        if(umask(cpm_options.umask_options[0]) != 0){
             FatalError(cpm_options.umask,"INA CHYBA",32);
         }
     }*/
@@ -61,7 +62,7 @@ int main(int argc, char* argv[])
     struct stat s;
 
 
-    if(!cpm_options.directory){
+    if(!cpm_options.directory && !cpm_options.link){
         //open input file
         if (access(cpm_options.infile, F_OK) != 0){ 
             FatalError('B',"SUBOR NEEXISTUJE",21);
@@ -187,15 +188,7 @@ int main(int argc, char* argv[])
             }
         }
         
-        //problematic on windows
-        // -k --link /---/ make hard link to file
-        // if(cpm_options.link){
-            
-        //     if (link(cpm_options.infile, cpm_options.outfile) != 0) {
-        //         FatalError(cpm_options.link,"INA CHYBA",30);
-        //     }
-        // }
-
+        
 
 
          close(file_in);
@@ -223,9 +216,10 @@ int main(int argc, char* argv[])
         fptr = fopen(cpm_options.outfile,"w");
 
         while((t = readdir(d)) != NULL){
-            if(stat(t->d_name,&s) != 0){
+            stat(t->d_name,&s);
+            /*if(stat(t->d_name,&s) != 0){
                 FatalError(cpm_options.directory,"VYSTUPNY SUBOR - CHYBA",28);
-            }
+            }*/
 
             char permision[11] = {0};
             permision[0] = (S_ISREG(s.st_mode)) ? ('-') : ('d');
@@ -260,6 +254,17 @@ int main(int argc, char* argv[])
     //-------------------------------------------------------------------
     // Osetrenie prepinacov po kopirovani
     //-------------------------------------------------------------------
+
+
+    //problematic on windows
+        // -k --link /---/ make hard link to file
+        if(cpm_options.link){
+            
+            if (link(cpm_options.infile, cpm_options.outfile) != 0) {
+                FatalError(cpm_options.link,"INA CHYBA",30);
+            }
+        }
+
     
     //- m (0777) --chmod
     if (cpm_options.chmod) {
