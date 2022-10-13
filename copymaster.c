@@ -31,6 +31,12 @@ int main(int argc, char* argv[])
     // Osetrenie prepinacov pred kopirovanim
     //-------------------------------------------------------------------
     
+    if (cpm_options.sparse && argc > 3) {
+        fprintf(stderr, "CHYBA PREPINACOV\n"); 
+        exit(EXIT_FAILURE);
+    }
+
+
     if (cpm_options.fast && cpm_options.slow) {
         fprintf(stderr, "CHYBA PREPINACOV\n"); 
         exit(EXIT_FAILURE);
@@ -48,12 +54,12 @@ int main(int argc, char* argv[])
     }
 
     //-u --unmask
-    printf("%c",cpm_options.umask_options[1][0]);
-    /*if (cpm_options.umask) {
+    //printf("%c",cpm_options.umask_options[1][0]);
+    if (cpm_options.umask) {
         if(umask(cpm_options.umask_options[0]) != 0){
             FatalError(cpm_options.umask,"INA CHYBA",32);
         }
-    }*/
+    }
     
     
     //-------------------------------------------------------------------
@@ -159,7 +165,17 @@ int main(int argc, char* argv[])
             while(read(file_in, &ch, 1) > 0){
                 write(file_out, &ch, 1);
             }
-        }else{
+        }else if(cpm_options.sparse){
+            char ch;
+            while(read(file_in, &ch, 1) > 0){
+                if(ch == '\0'){
+                    lseek(file_out,1,SEEK_CUR);
+                }else{
+                    write(file_out, &ch, 1);
+                }
+            }
+        }
+        else{
             char ch[size];
             read(file_in, &ch, size);
             write(file_out, &ch, size);
@@ -216,10 +232,9 @@ int main(int argc, char* argv[])
         fptr = fopen(cpm_options.outfile,"w");
 
         while((t = readdir(d)) != NULL){
-            stat(t->d_name,&s);
-            /*if(stat(t->d_name,&s) != 0){
+            if(stat(t->d_name,&s) != 0){
                 FatalError(cpm_options.directory,"VYSTUPNY SUBOR - CHYBA",28);
-            }*/
+            }
 
             char permision[11] = {0};
             permision[0] = (S_ISREG(s.st_mode)) ? ('-') : ('d');
@@ -257,13 +272,13 @@ int main(int argc, char* argv[])
 
 
     //problematic on windows
-        // -k --link /---/ make hard link to file
-        if(cpm_options.link){
-            
-            if (link(cpm_options.infile, cpm_options.outfile) != 0) {
-                FatalError(cpm_options.link,"INA CHYBA",30);
-            }
+    // -k --link /---/ make hard link to file
+    if(cpm_options.link){
+        
+        if (link(cpm_options.infile, cpm_options.outfile) != 0) {
+            FatalError(cpm_options.link,"INA CHYBA",30);
         }
+    }
 
     
     //- m (0777) --chmod
