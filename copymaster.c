@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
             file_in = open(cpm_options.infile, O_RDONLY);
         }
 
-        
+
         //get size and rights
         fstat(file_in,&s);
         int size = s.st_size; 
@@ -189,12 +189,12 @@ int main(int argc, char* argv[])
         
         //problematic on windows
         // -k --link /---/ make hard link to file
-        if(cpm_options.link){
+        // if(cpm_options.link){
             
-            if (link(cpm_options.infile, cpm_options.outfile) != 0) {
-                FatalError(cpm_options.link,"INA CHYBA",30);
-            }
-        }
+        //     if (link(cpm_options.infile, cpm_options.outfile) != 0) {
+        //         FatalError(cpm_options.link,"INA CHYBA",30);
+        //     }
+        // }
 
 
 
@@ -237,13 +237,13 @@ int main(int argc, char* argv[])
 
             //problematic on windows, no user-group-others model;
             //Group permissions:
-            permision[4] = (s.st_mode & S_IRGRP) ? ('r') : ('-');
-            permision[5] = (s.st_mode & S_IWGRP) ? ('w') : ('-');
-            permision[6] = (s.st_mode & S_IXGRP) ? ('x') : ('-');
-            //Others permissions:
-            permision[7] = (s.st_mode & S_IROTH) ? ('r') : ('-');
-            permision[8] = (s.st_mode & S_IWOTH) ? ('w') : ('-');
-            permision[9] = (s.st_mode & S_IXOTH) ? ('x') : ('-');
+            // permision[4] = (s.st_mode & S_IRGRP) ? ('r') : ('-');
+            // permision[5] = (s.st_mode & S_IWGRP) ? ('w') : ('-');
+            // permision[6] = (s.st_mode & S_IXGRP) ? ('x') : ('-');
+            // //Others permissions:
+            // permision[7] = (s.st_mode & S_IROTH) ? ('r') : ('-');
+            // permision[8] = (s.st_mode & S_IWOTH) ? ('w') : ('-');
+            // permision[9] = (s.st_mode & S_IXOTH) ? ('x') : ('-');
 
 
 
@@ -252,7 +252,7 @@ int main(int argc, char* argv[])
 
 
             strftime(MY_TIME, 100, "%d-%m-%Y", localtime( &s.st_mtime));
-            fprintf(fptr,"%s %d %d %d %lu %s %s\n",permision,s.st_nlink, s.st_uid, s.st_gid, s.st_size, MY_TIME, t->d_name);
+            fprintf(fptr,"%s %lu %d %d %ld %s %s\n",permision,s.st_nlink, s.st_uid, s.st_gid, s.st_size, MY_TIME, t->d_name);
         }
         fclose(fptr);
     }
