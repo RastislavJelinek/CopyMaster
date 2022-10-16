@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
     // Osetrenie prepinacov pred kopirovanim
     //-------------------------------------------------------------------
     
-    if (cpm_options.sparse && argc > 3) {
+    if (cpm_options.sparse && argc > 4) {
         fprintf(stderr, "CHYBA PREPINACOV\n"); 
         exit(EXIT_FAILURE);
     }
@@ -73,9 +73,6 @@ int main(int argc, char* argv[])
         if (access(cpm_options.infile, F_OK) != 0){ 
             FatalError('B',"SUBOR NEEXISTUJE",21);
         }
-        /*if(access(cpm_options.infile, R_OK) != 0 && access(cpm_options.infile, W_OK) != 0) {
-            FatalError('B',"INA CHYBA",21);
-        }*/
         int file_in = -1;
 
 
@@ -245,14 +242,14 @@ int main(int argc, char* argv[])
 
 
             //problematic on windows, no user-group-others model;
-            // //Group permissions:
-            // permision[4] = (s.st_mode & S_IRGRP) ? ('r') : ('-');
-            // permision[5] = (s.st_mode & S_IWGRP) ? ('w') : ('-');
-            // permision[6] = (s.st_mode & S_IXGRP) ? ('x') : ('-');
-            // //Others permissions:
-            // permision[7] = (s.st_mode & S_IROTH) ? ('r') : ('-');
-            // permision[8] = (s.st_mode & S_IWOTH) ? ('w') : ('-');
-            // permision[9] = (s.st_mode & S_IXOTH) ? ('x') : ('-');
+            //Group permissions:
+            permision[4] = (s.st_mode & S_IRGRP) ? ('r') : ('-');
+            permision[5] = (s.st_mode & S_IWGRP) ? ('w') : ('-');
+            permision[6] = (s.st_mode & S_IXGRP) ? ('x') : ('-');
+            //Others permissions:
+            permision[7] = (s.st_mode & S_IROTH) ? ('r') : ('-');
+            permision[8] = (s.st_mode & S_IWOTH) ? ('w') : ('-');
+            permision[9] = (s.st_mode & S_IXOTH) ? ('x') : ('-');
 
 
 
@@ -274,7 +271,6 @@ int main(int argc, char* argv[])
     //problematic on windows
     // -k --link /---/ make hard link to file
     if(cpm_options.link){
-        
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
