@@ -55,11 +55,11 @@ int main(int argc, char* argv[])
 
     //-u --unmask
     //printf("%c",cpm_options.umask_options[1][0]);
-    if (cpm_options.umask) {
+    /*if (cpm_options.umask) {
         if(umask(cpm_options.umask_options[0]) != 0){
             FatalError(cpm_options.umask,"INA CHYBA",32);
         }
-    }
+    }*/
     
     
     //-------------------------------------------------------------------
@@ -245,14 +245,14 @@ int main(int argc, char* argv[])
 
 
             //problematic on windows, no user-group-others model;
-            //Group permissions:
-            permision[4] = (s.st_mode & S_IRGRP) ? ('r') : ('-');
-            permision[5] = (s.st_mode & S_IWGRP) ? ('w') : ('-');
-            permision[6] = (s.st_mode & S_IXGRP) ? ('x') : ('-');
-            //Others permissions:
-            permision[7] = (s.st_mode & S_IROTH) ? ('r') : ('-');
-            permision[8] = (s.st_mode & S_IWOTH) ? ('w') : ('-');
-            permision[9] = (s.st_mode & S_IXOTH) ? ('x') : ('-');
+            // //Group permissions:
+            // permision[4] = (s.st_mode & S_IRGRP) ? ('r') : ('-');
+            // permision[5] = (s.st_mode & S_IWGRP) ? ('w') : ('-');
+            // permision[6] = (s.st_mode & S_IXGRP) ? ('x') : ('-');
+            // //Others permissions:
+            // permision[7] = (s.st_mode & S_IROTH) ? ('r') : ('-');
+            // permision[8] = (s.st_mode & S_IWOTH) ? ('w') : ('-');
+            // permision[9] = (s.st_mode & S_IXOTH) ? ('x') : ('-');
 
 
 
