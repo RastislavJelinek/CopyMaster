@@ -53,13 +53,7 @@ int main(int argc, char* argv[])
         FatalError('k',"VYSTUPNY SUBOR UZ EXISTUJE",30);
     }
 
-    //-u --unmask
-    //printf("%c",cpm_options.umask_options[1][0]);
-    /*if (cpm_options.umask) {
-        if(umask(cpm_options.umask_options[0]) != 0){
-            FatalError(cpm_options.umask,"INA CHYBA",32);
-        }
-    }*/
+    
     
     
     //-------------------------------------------------------------------
@@ -87,6 +81,60 @@ int main(int argc, char* argv[])
         fstat(file_in,&s);
         int size = s.st_size; 
         mode_t input_mode = s.st_mode;
+
+
+
+        //-u --unmask
+        if (cpm_options.umask) {
+            mode_t mode = s.st_mode;
+
+            for(int i = 0; i < 10 ; ++i){
+                switch(cpm_options.umask_options[i][0]){
+                    case 'u':
+                        switch(cpm_options.umask_options[i][2]){
+                            case 'r':
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IRUSR)) : (mode &= ~(S_IRUSR));
+                            break;
+                            case 'w':
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IWUSR)) : (mode &= ~(S_IWUSR));
+                            break;
+                            case 'x': 
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IXUSR)) : (mode &= ~(S_IXUSR));
+                            break;
+                        }
+                    break;
+                    case 'g':
+                        switch(cpm_options.umask_options[i][2]){
+                            case 'r':
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IRGRP)) : (mode &= ~(S_IRGRP));
+                            break;
+                            case 'w':
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IWGRP)) : (mode &= ~(S_IWGRP));
+                            break;
+                            case 'x': 
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IXGRP)) : (mode &= ~(S_IXGRP));
+                            break;
+                        }
+                    break;
+                    case 'o':
+                        switch(cpm_options.umask_options[i][2]){
+                            case 'r':
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IROTH)) : (mode &= ~(S_IROTH));
+                            break;
+                            case 'w':
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IWOTH)) : (mode &= ~(S_IWOTH));
+                            break;
+                            case 'x': 
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IXOTH)) : (mode &= ~(S_IXOTH));
+                            break;
+                        }
+                    break;
+                }
+            }
+            if(umask(mode) != 0){
+                FatalError(cpm_options.umask,"INA CHYBA",32);
+            }
+        }
 
         if(cpm_options.inode && !S_ISREG(s.st_mode)){
             FatalError('i',"ZLY TYP VSTUPNEHO SUBORU",27);
@@ -260,6 +308,7 @@ int main(int argc, char* argv[])
 
             strftime(MY_TIME, 100, "%d-%m-%Y", localtime( &s.st_mtime));
             fprintf(fptr,"%s %lu %d %d %ld %s %s\n",permision,s.st_nlink, s.st_uid, s.st_gid, s.st_size, MY_TIME, t->d_name);
+            //fprintf(fptr,"%s %d %d %d %ld %s %s\n",permision,s.st_nlink, s.st_uid, s.st_gid, s.st_size, MY_TIME, t->d_name);
         }
         fclose(fptr);
     }
@@ -270,7 +319,7 @@ int main(int argc, char* argv[])
 
 
     //problematic on windows
-    // -k --link /---/ make hard link to file
+    //-k --link /---/ make hard link to file
     if(cpm_options.link){
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
