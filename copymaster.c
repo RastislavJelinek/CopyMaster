@@ -226,19 +226,12 @@ int main(int argc, char* argv[])
             read(file_in, &ch, size);
             write(file_out, &ch, size);
         }
-
-
-        
-
         
         if (cpm_options.chmod) {
             if(chmod(cpm_options.outfile, cpm_options.chmod_mode) != 0){
                 FatalError(cpm_options.truncate,"INA CHYBA",34);
             }
         }
-
-        
-        
         
         //-t --truncate
         if (cpm_options.truncate) {
