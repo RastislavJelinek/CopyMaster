@@ -278,7 +278,8 @@ int main(int argc, char* argv[])
         fptr = fopen(cpm_options.outfile,"w");
 
         while((t = readdir(d)) != NULL){
-            if(stat(t->d_name,&s) != 0){
+            char * file_name = t->d_name;
+            if(stat(file_name,&s) != 0){
                 FatalError(cpm_options.directory,"VYSTUPNY SUBOR - CHYBA",28);
             }
 
