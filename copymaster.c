@@ -214,55 +214,55 @@ int main(int argc, char* argv[])
     // Vypis adresara
     //-------------------------------------------------------------------
     //-D --directory
-    // if (cpm_options.directory) {
-    //     DIR *d;
-    //     struct dirent *t;
+    if (cpm_options.directory) {
+        DIR *d;
+        struct dirent *t;
 
-    //     if((d = opendir(cpm_options.infile)) == NULL){
-    //         FatalError(cpm_options.directory,"VSTUPNY SUBOR NIE JE ADRESAR",28);
-    //     }
+        if((d = opendir(cpm_options.infile)) == NULL){
+            FatalError(cpm_options.directory,"VSTUPNY SUBOR NIE JE ADRESAR",28);
+        }
 
-    //     struct stat s;
-    //     char MY_TIME[50];
+        struct stat s;
+        char MY_TIME[50];
 
-    //     FILE *fptr;
+        FILE *fptr;
 
-    //     fptr = fopen(cpm_options.outfile,"w");
+        fptr = fopen(cpm_options.outfile,"w");
 
-    //     while((t = readdir(d)) != NULL){
-    //         if(stat(t->d_name,&s) != 0){
-    //             FatalError(cpm_options.directory,"VYSTUPNY SUBOR - CHYBA",28);
-    //         }
+        while((t = readdir(d)) != NULL){
+            if(stat(t->d_name,&s) != 0){
+                FatalError(cpm_options.directory,"VYSTUPNY SUBOR - CHYBA",28);
+            }
 
-    //         char permision[11] = {0};
-    //         permision[0] = (S_ISREG(s.st_mode)) ? ('-') : ('d');
-    //         //Owner permissions:
-    //         permision[1] = (s.st_mode & S_IRUSR) ? ('r') : ('-');
-    //         permision[2] = (s.st_mode & S_IWUSR) ? ('w') : ('-');
-    //         permision[3] = (s.st_mode & S_IXUSR) ? ('x') : ('-');
-
-
-    //         //problematic on windows, no user-group-others model;
-    //         // //Group permissions:
-    //         // permision[4] = (s.st_mode & S_IRGRP) ? ('r') : ('-');
-    //         // permision[5] = (s.st_mode & S_IWGRP) ? ('w') : ('-');
-    //         // permision[6] = (s.st_mode & S_IXGRP) ? ('x') : ('-');
-    //         // //Others permissions:
-    //         // permision[7] = (s.st_mode & S_IROTH) ? ('r') : ('-');
-    //         // permision[8] = (s.st_mode & S_IWOTH) ? ('w') : ('-');
-    //         // permision[9] = (s.st_mode & S_IXOTH) ? ('x') : ('-');
+            char permision[11] = {0};
+            permision[0] = (S_ISREG(s.st_mode)) ? ('-') : ('d');
+            //Owner permissions:
+            permision[1] = (s.st_mode & S_IRUSR) ? ('r') : ('-');
+            permision[2] = (s.st_mode & S_IWUSR) ? ('w') : ('-');
+            permision[3] = (s.st_mode & S_IXUSR) ? ('x') : ('-');
 
 
+            //problematic on windows, no user-group-others model;
+            //Group permissions:
+            permision[4] = (s.st_mode & S_IRGRP) ? ('r') : ('-');
+            permision[5] = (s.st_mode & S_IWGRP) ? ('w') : ('-');
+            permision[6] = (s.st_mode & S_IXGRP) ? ('x') : ('-');
+            //Others permissions:
+            permision[7] = (s.st_mode & S_IROTH) ? ('r') : ('-');
+            permision[8] = (s.st_mode & S_IWOTH) ? ('w') : ('-');
+            permision[9] = (s.st_mode & S_IXOTH) ? ('x') : ('-');
 
 
-    //         permision[10] = '\0';
 
 
-    //         strftime(MY_TIME, 100, "%d-%m-%Y", localtime( &s.st_mtime));
-    //         fprintf(fptr,"%s %lu %d %d %ld %s %s\n",permision,s.st_nlink, s.st_uid, s.st_gid, s.st_size, MY_TIME, t->d_name);
-    //     }
-    //     fclose(fptr);
-    // }
+            permision[10] = '\0';
+
+
+            strftime(MY_TIME, 100, "%d-%m-%Y", localtime( &s.st_mtime));
+            fprintf(fptr,"%s %lu %d %d %ld %s %s\n",permision,s.st_nlink, s.st_uid, s.st_gid, s.st_size, MY_TIME, t->d_name);
+        }
+        fclose(fptr);
+    }
         
     //-------------------------------------------------------------------
     // Osetrenie prepinacov po kopirovani
@@ -271,11 +271,11 @@ int main(int argc, char* argv[])
 
     //problematic on windows
     // -k --link /---/ make hard link to file
-    /*if(cpm_options.link){
+    if(cpm_options.link){
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
             FatalError(cpm_options.link,"INA CHYBA",30);
         }
-    }*/
+    }
 
     
     //- m (0777) --chmod
