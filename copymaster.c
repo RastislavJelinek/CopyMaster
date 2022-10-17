@@ -269,13 +269,19 @@ int main(int argc, char* argv[])
         FILE *fptr;
 
         fptr = fopen(cpm_options.outfile,"w");
-
+        
+        char path[100];
         while((t = readdir(d)) != NULL){
-            char * file_name = t->d_name;
-            if(stat(file_name,&s) != 0){
+            //char * file_name = t->d_name;
+
+            strcpy(path, cpm_options.infile);
+            strcat(path,"/");
+            strcat(path, t->d_name);
+
+            if(stat(path,&s) != 0){
                 FatalError(cpm_options.directory,"VYSTUPNY SUBOR - CHYBA",28);
             }
-
+            
             char permision[11] = {0};
             permision[0] = (S_ISREG(s.st_mode)) ? ('-') : ('d');
             //Owner permissions:
@@ -306,7 +312,6 @@ int main(int argc, char* argv[])
         }
         fclose(fptr);
     }
-        
     //-------------------------------------------------------------------
     // Osetrenie prepinacov po kopirovani
     //-------------------------------------------------------------------
