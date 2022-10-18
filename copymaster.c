@@ -87,44 +87,46 @@ int main(int argc, char* argv[])
         //-u --unmask
         if (cpm_options.umask) {
             mode_t mode = s.st_mode;
-
-            for(int i = 0; i < 10 ; ++i){
+            //max kUMASK_OPTIONS_MAX_SZ switches 
+            for(int i = 0; i < kUMASK_OPTIONS_MAX_SZ ; ++i){
                 switch(cpm_options.umask_options[i][0]){
-                    case 'u':
+                    case 'u': //user
                         switch(cpm_options.umask_options[i][2]){
-                            case 'r':
+                            case 'r': //read
                                 (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IRUSR)) : (mode &= ~(S_IRUSR));
                             break;
-                            case 'w':
+                            case 'w': //write
                                 (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IWUSR)) : (mode &= ~(S_IWUSR));
                             break;
-                            case 'x': 
+                            case 'x': //execute
                                 (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IXUSR)) : (mode &= ~(S_IXUSR));
                             break;
                         }
                     break;
-                    case 'g':
+                    case 'g': //group
+                        //problematic on windows, no user-group-others model; 
                         switch(cpm_options.umask_options[i][2]){
-                            case 'r':
+                            case 'r': //read
                                 (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IRGRP)) : (mode &= ~(S_IRGRP));
                             break;
-                            case 'w':
+                            case 'w': //write
                                 (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IWGRP)) : (mode &= ~(S_IWGRP));
                             break;
-                            case 'x': 
+                            case 'x': //execute
                                 (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IXGRP)) : (mode &= ~(S_IXGRP));
                             break;
                         }
                     break;
-                    case 'o':
+                    case 'o':   //other
+                        //problematic on windows, no user-group-others model;
                         switch(cpm_options.umask_options[i][2]){
-                            case 'r':
+                            case 'r': //read
                                 (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IROTH)) : (mode &= ~(S_IROTH));
                             break;
-                            case 'w':
+                            case 'w': //write
                                 (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IWOTH)) : (mode &= ~(S_IWOTH));
                             break;
-                            case 'x': 
+                            case 'x': //execute
                                 (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IXOTH)) : (mode &= ~(S_IXOTH));
                             break;
                         }
@@ -136,6 +138,7 @@ int main(int argc, char* argv[])
             }
         }
 
+        //-i --inode (file inode number)
         if(cpm_options.inode && !S_ISREG(s.st_mode)){
             FatalError('i',"ZLY TYP VSTUPNEHO SUBORU",27);
         }
@@ -144,11 +147,11 @@ int main(int argc, char* argv[])
         }
 
         
-
+        //file int later used in open()
         int file_out = -1;
 
 
-        // -c (0644) --create TODO doriesit prava
+        // -c (0644) --create
         if(cpm_options.create){
             file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, cpm_options.create_mode);
             if (file_out == -1) {
@@ -210,7 +213,7 @@ int main(int argc, char* argv[])
             while(read(file_in, &ch, 1) > 0){
                 write(file_out, &ch, 1);
             }
-        }else if(cpm_options.sparse){
+        }else if(cpm_options.sparse){//-S --Sparse
             char ch;
             while(read(file_in, &ch, 1) > 0){
                 if(ch == '\0'){
@@ -220,13 +223,13 @@ int main(int argc, char* argv[])
                 }
             }
             ftruncate(file_out, size);
-        }
-        else{
+        }else{//-f --fast or default
             char ch[size];
             read(file_in, &ch, size);
             write(file_out, &ch, size);
         }
-        
+
+        //-m (rights in format 0777)
         if (cpm_options.chmod) {
             if(chmod(cpm_options.outfile, cpm_options.chmod_mode) != 0){
                 FatalError(cpm_options.truncate,"INA CHYBA",34);
@@ -272,16 +275,17 @@ int main(int argc, char* argv[])
         
         char path[100];
         while((t = readdir(d)) != NULL){
-            //char * file_name = t->d_name;
-
+            //file need to be in form: patch/filename
             strcpy(path, cpm_options.infile);
             strcat(path,"/");
             strcat(path, t->d_name);
 
+            //check file info(stat())
             if(stat(path,&s) != 0){
                 FatalError(cpm_options.directory,"VYSTUPNY SUBOR - CHYBA",28);
             }
             
+            //create char array of user-group-others RWX permisions
             char permision[11] = {0};
             permision[0] = (S_ISREG(s.st_mode)) ? ('-') : ('d');
             //Owner permissions:
@@ -305,9 +309,12 @@ int main(int argc, char* argv[])
 
             permision[10] = '\0';
 
-
+            //format .st_mtime to human readeble date
             strftime(MY_TIME, 100, "%d-%m-%Y", localtime( &s.st_mtime));
+            //print data to file
             fprintf(fptr,"%s %lu %d %d %ld %s %s\n",permision,s.st_nlink, s.st_uid, s.st_gid, s.st_size, MY_TIME, t->d_name);
+
+            //windows variable s.st_nlink is type int, linux is type unsigned short, giving compilation error
             //fprintf(fptr,"%s %d %d %d %ld %s %s\n",permision,s.st_nlink, s.st_uid, s.st_gid, s.st_size, MY_TIME, t->d_name);
         }
         fclose(fptr);
@@ -317,7 +324,7 @@ int main(int argc, char* argv[])
     //-------------------------------------------------------------------
 
 
-    //problematic on windows
+    //problematic on windows, hardlink created  differently
     //-k --link /---/ make hard link to file
     if(cpm_options.link){
         if (link(cpm_options.infile, cpm_options.outfile) != 0) {
@@ -353,6 +360,7 @@ void FatalError(char c, const char* msg, int exit_status)
     fprintf(stderr, "%c:%d\n", c, exit_status);
     exit(exit_status);
 }
+
 
 // void PrintCopymasterOptions(struct CopymasterOptions* cpm_options)
 // {
