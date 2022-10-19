@@ -100,10 +100,10 @@ int main(int argc, char* argv[])
                     case 'u': //user
                         switch(cpm_options.umask_options[i][2]){
                             case 'r': //read
-                                (cpm_options.umask_options[i][1] == '+') ? ( mode |= S_IXUSR) : (mode &= ~(S_IRUSR));
+                                (cpm_options.umask_options[i][1] == '+') ? ( mode |= S_IRUSR) : (mode &= ~(S_IRUSR));
                             break;
                             case 'w': //write
-                                (cpm_options.umask_options[i][1] == '+') ? ( mode |= S_IXUSR) : (mode &= ~(S_IWUSR));
+                                (cpm_options.umask_options[i][1] == '+') ? ( mode |= S_IWUSR) : (mode &= ~(S_IWUSR));
                             break;
                             case 'x': //execute
                                 (cpm_options.umask_options[i][1] == '+') ? ( mode |= S_IXUSR) : (mode &= ~(S_IXUSR));
