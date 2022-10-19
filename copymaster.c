@@ -81,12 +81,11 @@ int main(int argc, char* argv[])
         fstat(file_in,&s);
         int size = s.st_size; 
         mode_t input_mode = s.st_mode;
-
+        mode_t mode;
 
 
         //-u --unmask
         if (cpm_options.umask) {
-            mode_t mode;
             if(cpm_options.create){
                  mode = cpm_options.create_mode;
             }else{
@@ -171,7 +170,11 @@ int main(int argc, char* argv[])
 
         // -c (0644) --create
         if(cpm_options.create){
-            file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, cpm_options.create_mode);
+            if(cpm_options.umask){
+                file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, mode);
+            }else{
+                file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, cpm_options.create_mode);
+            }    
             if (file_out == -1) {
                 FatalError('c',"SUBOR EXISTUJE",23);
             }
