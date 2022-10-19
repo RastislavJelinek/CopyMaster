@@ -91,6 +91,9 @@ int main(int argc, char* argv[])
             }else{
                 mode = s.st_mode;
             }
+            printf("s.st_mode: %o\n",s.st_mode);
+            printf("cpm_options.create_mode: %o\n",cpm_options.create_mode);
+            printf("mode pred: %o\n",mode);
              int i = 0;
              while (cpm_options.umask_options[i][0] != 0){
                 switch(cpm_options.umask_options[i][0]){
@@ -150,9 +153,10 @@ int main(int argc, char* argv[])
                 }
                 ++i;
             }
-            if(umask(mode) != 0){
+            printf("mode po: %o\n",mode);
+            /*if(umask(mode) != 0){
                 FatalError(cpm_options.umask,"INA CHYBA",32);
-            }
+            }*/
         }
 
         //-i --inode (file inode number)
