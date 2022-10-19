@@ -114,13 +114,13 @@ int main(int argc, char* argv[])
                         //problematic on windows, no user-group-others model; 
                         switch(cpm_options.umask_options[i][2]){
                             case 'r': //read
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IRGRP)) : (mode &= ~(S_IRGRP));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= S_IRGRP) : (mode &= ~(S_IRGRP));
                             break;
                             case 'w': //write
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IWGRP)) : (mode &= ~(S_IWGRP));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= S_IWGRP) : (mode &= ~(S_IWGRP));
                             break;
                             case 'x': //execute
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IXGRP)) : (mode &= ~(S_IXGRP));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= S_IXGRP) : (mode &= ~(S_IXGRP));
                             break;
                             default:
                                 FatalError(cpm_options.umask, "ZLA MASKA", 32);
@@ -131,13 +131,13 @@ int main(int argc, char* argv[])
                         //problematic on windows, no user-group-others model;
                         switch(cpm_options.umask_options[i][2]){
                             case 'r': //read
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IROTH)) : (mode &= ~(S_IROTH));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= S_IROTH) : (mode &= ~(S_IROTH));
                             break;
                             case 'w': //write
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IWOTH)) : (mode &= ~(S_IWOTH));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= S_IWOTH) : (mode &= ~(S_IWOTH));
                             break;
                             case 'x': //execute
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IXOTH)) : (mode &= ~(S_IXOTH));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode |= S_IXOTH) : (mode &= ~(S_IXOTH));
                             break;
                             default:
                                 FatalError(cpm_options.umask, "ZLA MASKA", 32);
