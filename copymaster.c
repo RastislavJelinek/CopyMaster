@@ -86,7 +86,13 @@ int main(int argc, char* argv[])
 
         //-u --unmask
         if (cpm_options.umask) {
-            mode_t mode = s.st_mode;
+            mode_t mode;
+            if(cpm_options.create){
+                 mode = cpm_options.create_mode;
+            }else{
+                mode = s.st_mode;
+            }
+            
             //max kUMASK_OPTIONS_MAX_SZ switches 
             for(int i = 0; i < kUMASK_OPTIONS_MAX_SZ ; ++i){
                 switch(cpm_options.umask_options[i][0]){
