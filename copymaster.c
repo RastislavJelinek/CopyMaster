@@ -92,21 +92,19 @@ int main(int argc, char* argv[])
             }else{
                 mode = s.st_mode;
             }
-            
-
-            //max kUMASK_OPTIONS_MAX_SZ switches 
-            for(int i = 0; i < kUMASK_OPTIONS_MAX_SZ ; ++i){
+             int i = 0;
+             while (cpm_options.umask_options[i][0] != 0){
                 switch(cpm_options.umask_options[i][0]){
                     case 'u': //user
                         switch(cpm_options.umask_options[i][2]){
                             case 'r': //read
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IRUSR)) : (mode &= ~(S_IRUSR));
+                                (cpm_options.umask_options[i][1] == '+') ? ( mode |= S_IXUSR) : (mode &= ~(S_IRUSR));
                             break;
                             case 'w': //write
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IWUSR)) : (mode &= ~(S_IWUSR));
+                                (cpm_options.umask_options[i][1] == '+') ? ( mode |= S_IXUSR) : (mode &= ~(S_IWUSR));
                             break;
                             case 'x': //execute
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= ~(S_IXUSR)) : (mode &= ~(S_IXUSR));
+                                (cpm_options.umask_options[i][1] == '+') ? ( mode |= S_IXUSR) : (mode &= ~(S_IXUSR));
                             break;
                             default:
                                 FatalError(cpm_options.umask, "ZLA MASKA", 32);
@@ -151,6 +149,7 @@ int main(int argc, char* argv[])
                         FatalError(cpm_options.umask, "ZLA MASKA", 32);
                     break;
                 }
+                ++i;
             }
             if(umask(mode) != 0){
                 FatalError(cpm_options.umask,"INA CHYBA",32);
