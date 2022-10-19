@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
     // Vypis hodnot prepinacov odstrante z finalnej verzie
     
     //PrintCopymasterOptions(&cpm_options);
-    
+    //test
     //-------------------------------------------------------------------
     // Osetrenie prepinacov pred kopirovanim
     //-------------------------------------------------------------------
