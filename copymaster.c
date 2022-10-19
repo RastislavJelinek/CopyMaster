@@ -18,6 +18,8 @@ void PrintCopymasterOptions(struct CopymasterOptions* cpm_options);
 
 int main(int argc, char* argv[])
 {
+
+    
     struct CopymasterOptions cpm_options = ParseCopymasterOptions(argc, argv);
     //-------------------------------------------------------------------
     // Kontrola hodnot prepinacov
@@ -87,7 +89,7 @@ int main(int argc, char* argv[])
         //-u --unmask
         if (cpm_options.umask) {
             if(cpm_options.create){
-                 mode = cpm_options.create_mode;
+                mode = cpm_options.create_mode;
             }else{
                 mode = s.st_mode;
             }
@@ -154,9 +156,7 @@ int main(int argc, char* argv[])
                 ++i;
             }
             printf("mode po: %o\n",mode);
-            /*if(umask(mode) != 0){
-                FatalError(cpm_options.umask,"INA CHYBA",32);
-            }*/
+            umask(mode);
         }
 
         //-i --inode (file inode number)
@@ -174,11 +174,13 @@ int main(int argc, char* argv[])
 
         // -c (0644) --create
         if(cpm_options.create){
-            if(cpm_options.umask){
-                file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, mode);
+            /*if(cpm_options.umask){
+                file_out = open(cpm_options.outfile, O_EXCL | O_CREAT, 0000);
             }else{
                 file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, cpm_options.create_mode);
-            }    
+            } */  
+            printf("%o",cpm_options.create_mode); 
+            file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, cpm_options.create_mode);
             if (file_out == -1) {
                 FatalError('c',"SUBOR EXISTUJE",23);
             }
@@ -254,22 +256,9 @@ int main(int argc, char* argv[])
             write(file_out, &ch, size);
         }
 
-        //-m (rights in format 0777)
-        if (cpm_options.chmod) {
-            if(chmod(cpm_options.outfile, cpm_options.chmod_mode) != 0){
-                FatalError(cpm_options.truncate,"INA CHYBA",34);
-            }
-        }
         
-        //-t --truncate
-        if (cpm_options.truncate) {
-            if(cpm_options.truncate_size < 0){
-                FatalError(cpm_options.truncate,"ZAPORNA VELKOST",31);
-            }
-            if(ftruncate(file_in, cpm_options.truncate_size) != 0){
-                FatalError(cpm_options.truncate,"INA CHYBA",31);
-            }
-        }
+        
+        
         
         
 
@@ -348,6 +337,15 @@ int main(int argc, char* argv[])
     // Osetrenie prepinacov po kopirovani
     //-------------------------------------------------------------------
 
+    //-t --truncate
+    if (cpm_options.truncate) {
+        if(cpm_options.truncate_size < 0){
+            FatalError(cpm_options.truncate,"ZAPORNA VELKOST",31);
+        }
+        if(truncate(cpm_options.infile, cpm_options.truncate_size) != 0){
+            FatalError(cpm_options.truncate,"INA CHYBA",31);
+        }
+    }
 
     //problematic on windows, hardlink created  differently
     //-k --link /---/ make hard link to file
