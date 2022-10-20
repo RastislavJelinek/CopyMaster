@@ -1,0 +1,6 @@
+copymaster
+infile
+outfile
+obj/copymaster.o
+obj/options.o
+copymaster

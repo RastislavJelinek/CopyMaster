@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
                 ++i;
             }
             printf("mode po: %o\n",mode);
-            umask(mode);
+            //umask(mode);
         }
 
         //-i --inode (file inode number)
@@ -174,13 +174,13 @@ int main(int argc, char* argv[])
 
         // -c (0644) --create
         if(cpm_options.create){
-            /*if(cpm_options.umask){
-                file_out = open(cpm_options.outfile, O_EXCL | O_CREAT, 0000);
+            if(cpm_options.umask){
+                file_out = open(cpm_options.outfile, O_EXCL | O_CREAT, mode);
             }else{
                 file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, cpm_options.create_mode);
-            } */  
-            printf("%o",cpm_options.create_mode); 
-            file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, cpm_options.create_mode);
+            } 
+            /*printf("%o",cpm_options.create_mode); 
+            file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, cpm_options.create_mode); */
             if (file_out == -1) {
                 FatalError('c',"SUBOR EXISTUJE",23);
             }
