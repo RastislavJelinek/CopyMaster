@@ -83,32 +83,24 @@ int main(int argc, char* argv[])
         fstat(file_in,&s);
         int size = s.st_size; 
         mode_t input_mode = s.st_mode;
-        mode_t mode;
+        mode_t mode = umask(0);
 
 
         //-u --unmask
         if (cpm_options.umask) {
-            if(cpm_options.create){
-                mode = cpm_options.create_mode;
-            }else{
-                mode = s.st_mode;
-            }
-            printf("s.st_mode: %o\n",s.st_mode);
-            printf("cpm_options.create_mode: %o\n",cpm_options.create_mode);
-            printf("mode pred: %o\n",mode);
              int i = 0;
              while (cpm_options.umask_options[i][0] != 0){
                 switch(cpm_options.umask_options[i][0]){
                     case 'u': //user
                         switch(cpm_options.umask_options[i][2]){
                             case 'r': //read
-                                (cpm_options.umask_options[i][1] == '+') ? ( mode |= S_IRUSR) : (mode &= ~(S_IRUSR));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode &= ~(S_IRUSR)) : ( mode |= S_IRUSR);
                             break;
                             case 'w': //write
-                                (cpm_options.umask_options[i][1] == '+') ? ( mode |= S_IWUSR) : (mode &= ~(S_IWUSR));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode &= ~(S_IWUSR)) : ( mode |= S_IWUSR);
                             break;
                             case 'x': //execute
-                                (cpm_options.umask_options[i][1] == '+') ? ( mode |= S_IXUSR) : (mode &= ~(S_IXUSR));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode &= ~(S_IXUSR)) : ( mode |= S_IXUSR);
                             break;
                             default:
                                 FatalError(cpm_options.umask, "ZLA MASKA", 32);
@@ -119,13 +111,13 @@ int main(int argc, char* argv[])
                         //problematic on windows, no user-group-others model; 
                         switch(cpm_options.umask_options[i][2]){
                             case 'r': //read
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= S_IRGRP) : (mode &= ~(S_IRGRP));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode &= ~(S_IRGRP)) : (mode |= S_IRGRP);
                             break;
                             case 'w': //write
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= S_IWGRP) : (mode &= ~(S_IWGRP));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode &= ~(S_IWGRP)) : (mode |= S_IWGRP);
                             break;
                             case 'x': //execute
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= S_IXGRP) : (mode &= ~(S_IXGRP));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode &= ~(S_IXGRP)) : (mode |= S_IXGRP);
                             break;
                             default:
                                 FatalError(cpm_options.umask, "ZLA MASKA", 32);
@@ -136,13 +128,13 @@ int main(int argc, char* argv[])
                         //problematic on windows, no user-group-others model;
                         switch(cpm_options.umask_options[i][2]){
                             case 'r': //read
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= S_IROTH) : (mode &= ~(S_IROTH));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode &= ~(S_IROTH)) : (mode |= S_IROTH);
                             break;
                             case 'w': //write
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= S_IWOTH) : (mode &= ~(S_IWOTH));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode &= ~(S_IWOTH)) : (mode |= S_IWOTH);
                             break;
                             case 'x': //execute
-                                (cpm_options.umask_options[i][1] == '+') ? (mode |= S_IXOTH) : (mode &= ~(S_IXOTH));
+                                (cpm_options.umask_options[i][1] == '+') ? (mode &= ~(S_IXOTH)) : (mode |= S_IXOTH);
                             break;
                             default:
                                 FatalError(cpm_options.umask, "ZLA MASKA", 32);
@@ -155,8 +147,7 @@ int main(int argc, char* argv[])
                 }
                 ++i;
             }
-            printf("mode po: %o\n",mode);
-            //umask(mode);
+            umask(mode);
         }
 
         //-i --inode (file inode number)
@@ -174,13 +165,7 @@ int main(int argc, char* argv[])
 
         // -c (0644) --create
         if(cpm_options.create){
-            if(cpm_options.umask){
-                file_out = open(cpm_options.outfile, O_EXCL | O_CREAT, mode);
-            }else{
-                file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, cpm_options.create_mode);
-            } 
-            /*printf("%o",cpm_options.create_mode); 
-            file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, cpm_options.create_mode); */
+            file_out = open(cpm_options.outfile, O_EXCL | O_CREAT| O_WRONLY, cpm_options.create_mode);
             if (file_out == -1) {
                 FatalError('c',"SUBOR EXISTUJE",23);
             }
@@ -255,14 +240,6 @@ int main(int argc, char* argv[])
             read(file_in, &ch, size);
             write(file_out, &ch, size);
         }
-
-        
-        
-        
-        
-        
-
-
          close(file_in);
          close(file_out);
     }
