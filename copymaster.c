@@ -72,11 +72,8 @@ int main(int argc, char* argv[])
         int file_in = -1;
 
 
-        if(cpm_options.truncate){
-            file_in = open(cpm_options.infile, O_RDWR);
-        }else{
-            file_in = open(cpm_options.infile, O_RDONLY);
-        }
+        file_in = open(cpm_options.infile, O_RDONLY);
+        
 
 
         //get size and rights
@@ -84,7 +81,6 @@ int main(int argc, char* argv[])
         int size = s.st_size; 
         mode_t input_mode = s.st_mode;
         mode_t mode = umask(0);
-
 
         //-u --unmask
         if (cpm_options.umask) {
@@ -228,11 +224,7 @@ int main(int argc, char* argv[])
         }else if(cpm_options.sparse){//-S --Sparse
             char ch;
             while(read(file_in, &ch, 1) > 0){
-                if(ch == '\0'){
-                    lseek(file_out,1,SEEK_CUR);
-                }else{
-                    write(file_out, &ch, 1);
-                }
+                (ch == '\0') ? (lseek(file_out,1,SEEK_CUR)) : (write(file_out, &ch, 1));
             }
             ftruncate(file_out, size);
         }else{//-f --fast or default
