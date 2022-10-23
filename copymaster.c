@@ -169,17 +169,14 @@ int main(int argc, char* argv[])
 
         // -o --overwrite 
         if(cpm_options.overwrite){
-            file_out = open(cpm_options.outfile, O_TRUNC | O_WRONLY);
-            if (file_out == -1) {
+            if ((file_out = open(cpm_options.outfile, O_TRUNC | O_WRONLY)) == -1) {
                 FatalError('o',"SUBOR NEEXISTUJE",24);
             }
-            
         } 
 
         // -a --append
         if(cpm_options.append){
-            file_out = open(cpm_options.outfile, O_APPEND | O_WRONLY);
-            if (file_out == -1) {
+            if ((file_out = open(cpm_options.outfile, O_APPEND | O_WRONLY)) == -1) {
                 FatalError(cpm_options.append,"SUBOR NEEXISTUJE",22);
             }
             
@@ -188,8 +185,7 @@ int main(int argc, char* argv[])
 
         // -l --lseek
         if(cpm_options.lseek){
-            file_out = open(cpm_options.outfile, O_WRONLY); 
-            if (file_out == -1) {
+            if ((file_out = open(cpm_options.outfile, O_WRONLY)) == -1) {
                 FatalError(cpm_options.lseek,"SUBOR NEEXISTUJE",33);
             }
             if(lseek(file_in, cpm_options.lseek_options.pos1, SEEK_CUR) == -1){
@@ -201,17 +197,15 @@ int main(int argc, char* argv[])
             }
 
             size = cpm_options.lseek_options.num;
-            
         }
 
 
 
         // no arg || -s --slow || -f --fast || -i --inode
         if(file_out == -1){
-            if (access(cpm_options.outfile, F_OK) == 0 && access(cpm_options.outfile, W_OK) != 0) {
+            if ((file_out = open(cpm_options.outfile, O_TRUNC | O_CREAT | O_WRONLY, input_mode)) == -1) {
                 FatalError('B',"INA CHYBA",21);
             }
-            file_out = open(cpm_options.outfile, O_TRUNC | O_CREAT | O_WRONLY, input_mode);
         }
 
 
@@ -232,8 +226,9 @@ int main(int argc, char* argv[])
             read(file_in, &ch, size);
             write(file_out, &ch, size);
         }
-         close(file_in);
-         close(file_out);
+
+        close(file_in);
+        close(file_out);
     }
     
     
@@ -255,6 +250,9 @@ int main(int argc, char* argv[])
         FILE *fptr;
 
         fptr = fopen(cpm_options.outfile,"w");
+        if (fptr == NULL) {
+            FatalError(cpm_options.directory,"VYSTUPNY SUBOR - CHYBA",28);
+        }
         
         char path[100];
         while((t = readdir(d)) != NULL){
